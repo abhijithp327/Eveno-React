@@ -17,19 +17,9 @@ const ValidatedTicket = () => {
     const { width } = Dimensions.get('window');
     const route = useRoute();
 
-    const { data } = route.params;
-    console.log('data: ', data);
+    const { data, scanParams } = route.params;
+    // console.log('data: ', data);
 
-    const [isTicketValid, setIsTicketValid] = useState(true);
-    const [errorMessage, setErrorMessage] = useState("");
-
-    // Update state when data changes
-    // useEffect(() => {
-    //     if (data) {
-    //         setIsTicketValid(data.isValid);
-    //         setErrorMessage(data.message);
-    //     }
-    // }, [data]);
 
     return (
         <SafeAreaView style={[style.area, { backgroundColor: theme.input }]}>
@@ -220,7 +210,9 @@ const ValidatedTicket = () => {
                         alignItems: 'center',
                         marginBottom: 10,
                     }}
-                    onPress={() => navigation.navigate('ScanEvent')}
+                    onPress={() => {
+                        navigation.replace('Scanner', { ...scanParams, agenda: null });
+                    }}
                 >
                     <Text style={[style.btntxt, { color: Colors.secondary }]}>Scan Next Tickets</Text>
                 </TouchableOpacity>

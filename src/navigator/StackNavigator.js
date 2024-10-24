@@ -79,6 +79,8 @@ import TicketSuccess from '../screens/TicketSuccess';
 import InvalidTicket from '../screens/InvalidTicket';
 import ScanTicketDetail from '../screens/ScanTicketDetail';
 import QrExhibitor from '../screens/QrExhibitor';
+import InvalidedTicket from '../screens/InvalidatedTicket';
+import ScanExhibitor from '../screens/ScanExhibitor';
 
 
 const Stack = createNativeStackNavigator();
@@ -390,10 +392,23 @@ export default function StackNavigator() {
           />
 
           <Stack.Screen
+            name="InvalidedTicket"
+            component={InvalidedTicket}
+            options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
             name="QrExhibitor"
             component={QrExhibitor}
             options={{ headerShown: false }}
           />
+
+          <Stack.Screen
+            name="ScanExhibitor"
+            component={ScanExhibitor}
+            options={{ headerShown: false }}
+          />
+
 
           <Stack.Screen
             name="ScanTicketDetail"

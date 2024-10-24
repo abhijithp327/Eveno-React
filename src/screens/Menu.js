@@ -172,7 +172,7 @@ export default function Menu() {
                         >
                             <View
                                 style={{
-                                    backgroundColor: Colors.orange,
+                                    backgroundColor: Colors.default,
                                     borderRadius: 100,
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -182,7 +182,7 @@ export default function Menu() {
                                     height: 40
                                 }}
                             >
-                                <Icon name={item.icon} size={20}  color="#fff" />
+                                <Icon name={item.icon} size={20} color="#fff" />
                                 {/* <Text>+</Text> */}
                             </View>
                             <View style={{ marginLeft: 12, flex: 1 }}>
@@ -214,7 +214,7 @@ export default function Menu() {
 
                         <TouchableOpacity
                             style={{
-                                backgroundColor: Colors.orange,
+                                backgroundColor: Colors.default,
                                 paddingVertical: 10,
                                 paddingHorizontal: 16,
                                 borderRadius: 5,

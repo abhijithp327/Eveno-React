@@ -1,45 +1,72 @@
-import { View, Text, SafeAreaView, TextInput, StatusBar, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native'
-import React, { useState, useContext, useEffect } from 'react'
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Dimensions } from 'react-native'
+import React, { useContext } from 'react'
 import themeContext from '../theme/themeContex';
 import style from '../theme/style';
 import { Colors } from '../theme/color';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Avatar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { AppBar } from '@react-native-material/core';
 import IonIcon from 'react-native-vector-icons/Ionicons';
-
+import QRCode from 'react-native-qrcode-svg';
 
 const TicketSuccess = () => {
-
     const theme = useContext(themeContext);
     const navigation = useNavigation();
     const { width } = Dimensions.get('window');
     const route = useRoute();
+    const { data } = route.params;
 
-    // const { data } = route.params;
-    // console.log('data: ', data);
+    // Create QR code data string
+    const qrCodeData = JSON.stringify({
+        ticketId: data.ticket.id,
+        ticketName: data.ticket.ticket_name,
+        eventId: data.event.id,
+        eventTitle: data.event.title,
+        qrCode: data.ticket.ticket_qr_code,
+    });
 
-    const [isTicketValid, setIsTicketValid] = useState(true);
-    const [errorMessage, setErrorMessage] = useState("Nothing");
+    const renderHistoryItem = (item, index) => (
+        <View
+            key={index}
+            style={{
+                backgroundColor: Colors.secondary,
+                borderRadius: 10,
+                padding: 15,
+                marginBottom: 10,
+                borderColor: Colors.secondary1,
+                borderWidth: 2,
+            }}
+        >
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flex: 1 }}>
+                    <Text style={[style.b14, { color: theme.txt }]}>{item.message}</Text>
+                    <Text style={[style.r12, { color: Colors.disable }]}>
+                        {new Date(item.datetime).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </Text>
+                </View>
+                <Icon
+                    name={item.isSuccess ? "check-circle" : "times-circle"}
+                    size={20}
+                    color={item.isSuccess ? Colors.success : Colors.default}
+                    style={{ marginLeft: 10 }}
+                />
 
-    // Update state when data changes
-    // useEffect(() => {
-    //     if (data) {
-    //         setIsTicketValid(data.isValid);
-    //         setErrorMessage(data.message);
-    //     }
-    // }, [data]);
+            </View>
+        </View>
+    );
 
     return (
         <SafeAreaView style={[style.area, { backgroundColor: theme.input }]}>
             <View style={[style.main, { backgroundColor: theme.input, marginTop: 10, marginBottom: 16 }]}>
-
-                {/* Modified Header Section */}
+                {/* Header Section */}
                 <View style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    // paddingHorizontal: 10,
                     marginBottom: 10
                 }}>
                     <TouchableOpacity
@@ -70,37 +97,50 @@ const TicketSuccess = () => {
                             marginBottom: 20,
                         }}
                     >
-                        <Image
-                            source={require('../../assets/image/qr.png')}
-                            style={{ width: 150, height: 150, marginBottom: 15 }}
+                        <QRCode
+                            value={qrCodeData}
+                            size={150}
+                            color="black"
+                            backgroundColor="white"
                         />
+                        <Text style={[style.b14, {
+                            color: Colors.active,
+                            marginTop: 10,
+                            textAlign: 'center'
+                        }]}>
+                            {'*****' + data.ticket.ticket_qr_code.slice(-5)}
+                        </Text>
                     </View>
+
                     {/* Event Details Section */}
                     <View
                         style={{
-                            flexDirection: 'row',
                             backgroundColor: Colors.secondary,
                             borderRadius: 10,
-                            padding: 10,
-                            alignItems: 'center',
+                            padding: 15,
                             marginBottom: 20,
                             borderColor: Colors.secondary,
                             borderWidth: 3,
                         }}
                     >
-                        <Image
-                            source={require('../../assets/image/m16.png')}
-                            style={{ width: 60, height: 60, borderRadius: 10, marginRight: 15 }}
-                        />
                         <View style={{ flex: 1 }}>
-                            <Text style={[style.title, { color: theme.txt, fontSize: 16, fontWeight: '600' }]}>
-                                Live Music By Melrick @ Stone
+                            <Text style={[style.title, {
+                                color: theme.txt,
+                                fontSize: 18,
+                                fontWeight: '600',
+                                marginBottom: 8
+                            }]}>
+                                {data.event.title}
                             </Text>
-                            {/* <Text style={{ color: Colors.disable, fontSize: 14, marginTop: 5 }}>
-                                    <Icon name="map-marker" size={14} color={Colors.disable} /> Stage Name, Bengaluru KA
-                                </Text> */}
+                            <Text style={[style.r12, {
+                                color: Colors.disable,
+                                fontSize: 14
+                            }]}>
+                                Event ID: {data.event.id}
+                            </Text>
                         </View>
                     </View>
+
                     {/* Ticket Info Section */}
                     <View
                         style={{
@@ -114,38 +154,29 @@ const TicketSuccess = () => {
                     >
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                             <Text style={[style.r12, { color: Colors.active, fontSize: 14 }]}>Type</Text>
-                            <Text style={[style.b12, { color: theme.txt, fontSize: 14, fontWeight: '600' }]}>Platinum</Text>
+                            <Text style={[style.b12, { color: theme.txt, fontSize: 14, fontWeight: '600' }]}>
+                                {data.ticket.ticket_name}
+                            </Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                             <Text style={[style.r12, { color: Colors.active, fontSize: 14 }]}>Price</Text>
-                            <Text style={[style.b12, { color: Colors.default, fontSize: 14, fontWeight: '600' }]}>AED 30</Text>
+                            <Text style={[style.b12, { color: Colors.default, fontSize: 14, fontWeight: '600' }]}>
+                                AED {data.ticket.ticket_price}
+                            </Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={[style.r12, { color: Colors.active, fontSize: 14 }]}>Status</Text>
+                            <Text style={[style.b12, {
+                                color: data.ticket.isDet ? Colors.default : Colors.success,
+                                fontSize: 14,
+                                fontWeight: '600'
+                            }]}>
+                                {data.ticket.isDet ? 'Used' : 'Valid'}
+                            </Text>
                         </View>
                     </View>
-                    {/* Dates Section */}
-                    <View
-                        style={{
-                            backgroundColor: Colors.secondary,
-                            borderRadius: 10,
-                            padding: 15,
-                            marginBottom: 20,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            borderColor: Colors.secondary1,
-                            borderWidth: 2,
-                        }}
-                    >
-                        <View style={{ alignItems: 'center', flex: 1 }}>
-                            <Icon name="calendar" size={16} color={Colors.disable} />
-                            <Text style={[style.r14, { color: Colors.disable, fontSize: 14, marginTop: 5 }]}>Start Date</Text>
-                            <Text style={[style.b14, { color: theme.txt, fontSize: 14, marginTop: 3 }]}>Jul 2, 8:00 PM</Text>
-                        </View>
-                        <View style={{ alignItems: 'center', flex: 1 }}>
-                            <Icon name="calendar" size={16} color={Colors.disable} />
-                            <Text style={[style.r14, { color: Colors.disable, fontSize: 14, marginTop: 5 }]}>End Date</Text>
-                            <Text style={[style.b14, { color: theme.txt, fontSize: 14, marginTop: 3 }]}>Jul 2, 8:00 PM</Text>
-                        </View>
-                    </View>
-                    {/* Email Section */}
+
+                    {/* Customer Details Section */}
                     <View
                         style={{
                             backgroundColor: Colors.secondary,
@@ -165,7 +196,7 @@ const TicketSuccess = () => {
                             borderBottomColor: Colors.border,
                             paddingBottom: 8
                         }]}>
-                            Leslie Alexander
+                            {data.order.name}
                         </Text>
                         <View style={{ marginBottom: 12 }}>
                             <Text style={[style.r12, {
@@ -179,7 +210,7 @@ const TicketSuccess = () => {
                                 color: theme.txt,
                                 fontSize: 14
                             }]}>
-                                lesliealexander@gmail.com
+                                {data.order.email}
                             </Text>
                         </View>
                         <View>
@@ -194,14 +225,40 @@ const TicketSuccess = () => {
                                 color: theme.txt,
                                 fontSize: 14
                             }]}>
-                                +242 2929 91001
+                                {data.order.phone || 'Not provided'}
                             </Text>
                         </View>
                     </View>
+
+                    {/* History Section */}
+                    {data.history && data.history.length > 0 && (
+                        <View
+                            style={{
+                                backgroundColor: Colors.secondary,
+                                borderRadius: 10,
+                                padding: 15,
+                                marginBottom: 20,
+                                borderColor: Colors.secondary1,
+                                borderWidth: 2,
+                            }}
+                        >
+                            <Text style={[style.b16, {
+                                color: theme.txt,
+                                fontSize: 16,
+                                fontWeight: '600',
+                                marginBottom: 15,
+                                borderBottomWidth: 1,
+                                borderBottomColor: Colors.border,
+                                paddingBottom: 8
+                            }]}>
+                                Ticket History
+                            </Text>
+                            {data.history.map((item, index) => renderHistoryItem(item, index))}
+                        </View>
+                    )}
                 </ScrollView>
-
-
             </View>
+
             {/* Buttons */}
             <View style={{ alignItems: 'center', backgroundColor: Colors.secondary, marginBottom: 16 }}>
                 <TouchableOpacity
@@ -213,7 +270,9 @@ const TicketSuccess = () => {
                         alignItems: 'center',
                         marginBottom: 10,
                     }}
-                    onPress={() => navigation.navigate('ScanEvent')}
+                    onPress={() => {
+                        navigation.replace('ScanTicketDetail');
+                    }}
                 >
                     <Text style={[style.btntxt, { color: Colors.secondary }]}>Scan Next Tickets</Text>
                 </TouchableOpacity>
@@ -225,7 +284,7 @@ const TicketSuccess = () => {
                         borderRadius: 10,
                         alignItems: 'center',
                     }}
-                    onPress={() => navigation.navigate('Home')}
+                    onPress={() => navigation.navigate('BottomNavigator')}
                 >
                     <Text style={[style.btntxt, { color: Colors.secondary }]}>Go Home</Text>
                 </TouchableOpacity>

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getAllEventsApi, scanEventApi, scanTicketDetailApi } from "../actions/event";
+import { getAllEventsApi, getAllExhibitorEventsApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi } from "../actions/event";
 
 
 
@@ -18,6 +18,16 @@ const initialState = {
     isScanTicketLoaded: false,
     isScanTicketLoadError: false,
 
+    isScanExhibitorLoading: false,
+    isScanExhibitorLoaded: false,
+    isScanExhibitorLoadError: false,
+
+    isExhibitorEventsLoading: false,
+    isExhibitorEventsLoaded: false,
+    isExhibitorEventsLoadError: false,
+    allExhibitorEvents: [],
+
+
 };
 
 
@@ -33,6 +43,7 @@ export const getAllEvents = createAsyncThunk('events', async ({ perPage = 10, pa
 });
 
 export const scanEvent = createAsyncThunk('scanEvent', async ({ id, data }, thunkAPI) => {
+    console.log('id: ', id, 'data: ', data);
     try {
         const response = await scanEventApi(id, data);
         return thunkAPI.fulfillWithValue(response);
@@ -41,14 +52,34 @@ export const scanEvent = createAsyncThunk('scanEvent', async ({ id, data }, thun
     }
 });
 
-export const scanTicketDetail = createAsyncThunk('scanTicketDetail', async (_, thunkAPI) => {
+export const scanTicketDetail = createAsyncThunk('scanTicketDetail', async (data, thunkAPI) => {
     try {
-        const response = await scanTicketDetailApi();
+        const response = await scanTicketDetailApi(data);
         return thunkAPI.fulfillWithValue(response);
     } catch (error) {
         return thunkAPI.rejectWithValue(error.message);
     }
 });
+
+export const scanTicketExhibitor = createAsyncThunk('scanTicketExhibitor', async ({ id, data }, thunkAPI) => {
+    try {
+        const response = await scanTicketExhibitorApi(id, data);
+        return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+});
+
+
+export const getAllExhibitorEvents = createAsyncThunk('getAllExhibitorEvents', async ({ perPage = 10, page = 1, searchQuery = '' }, thunkAPI) => {
+    try {
+        const response = await getAllExhibitorEventsApi(perPage, page, searchQuery);
+        return thunkAPI.fulfillWithValue(response.result);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+});
+
 
 const eventSlice = createSlice({
     name: "event",
@@ -107,7 +138,25 @@ const eventSlice = createSlice({
                 state.isScanTicketLoadError = true;
             })
 
-            
+            // get all exhibitor events
+            .addCase(getAllExhibitorEvents.pending, (state) => {
+                state.isExhibitorEventsLoading = true;
+                state.isExhibitorEventsLoaded = false;
+                state.isExhibitorEventsLoadError = false;
+            })
+            .addCase(getAllExhibitorEvents.fulfilled, (state, action) => {
+                state.isExhibitorEventsLoading = false;
+                state.isExhibitorEventsLoaded = true;
+                state.isExhibitorEventsLoadError = false;
+                state.allExhibitorEvents = action.payload;
+            })
+            .addCase(getAllExhibitorEvents.rejected, (state, action) => {
+                state.isExhibitorEventsLoading = false;
+                state.isExhibitorEventsLoaded = false;
+                state.isExhibitorEventsLoadError = true;
+            })
+
+
     }
 });
 

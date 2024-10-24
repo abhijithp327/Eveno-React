@@ -8,7 +8,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import { AppBar } from '@react-native-material/core';
 import { useRoute } from '@react-navigation/native';
-import { scanEvent } from '../redux/features/eventSlice';
+import { scanEvent, scanTicketDetail, scanTicketExhibitor } from '../redux/features/eventSlice';
 import { useDispatch } from 'react-redux';
 
 // import { ViewPropTypes } from 'react-native-view-prop-types';
@@ -20,13 +20,14 @@ import { useDispatch } from 'react-redux';
 // Get screen dimensions
 const { width, height } = Dimensions.get('window');
 
-const Scanner = () => {
+const ScanExhibitor = () => {
 
     const route = useRoute();
 
     const dispatch = useDispatch();
-    const { event_id, gate, agenda } = route?.params;
-    console.log('event_id: ', event_id, 'gate: ', gate, 'agenda: ', agenda);
+
+    // const { event_id, gate, agenda } = route?.params;
+
 
     const theme = useContext(themeContext);
     const navigation = useNavigation();
@@ -50,39 +51,41 @@ const Scanner = () => {
 
         const qrData = e.data;
         const data = {
-            gate_id: gate,
-            agenda_id: null,
             code: qrData
         }
+
         try {
-            const response = await dispatch(scanEvent({ id: event_id, data }));
-            console.log('response', response.payload.result);
+
+            const response = await dispatch(scanTicketExhibitor({ id: event_id, data }));
+            console.log('response', response);
             if (response.payload && response.payload.success) {
                 const result = response.payload.result;
-                console.log('result', result.isValid);
-                if (result.isValid) {
-                    navigation.replace('ValidatedTicket', { data: result, scanParams: { event_id, gate, agenda } });
-                } else {
-                    navigation.replace('InvalidedTicket', { data: result, scanParams: { event_id, gate, agenda } });
+                if (result) {
+                    navigation.replace('TicketSuccess', { data: result });
                 }
             } else {
-                alert(response.payload.message);
+                navigation.replace('InvalidTicket', {
+                    data: response.payload,
+                    code: qrData
+                });
             }
         } catch (error) {
-            alert('Something went wrong. Please try again.');
+            console.log('error', error);
+            // alert('Something went wrong. Please try again.');
         }
     };
 
     return (
         <SafeAreaView style={[style.area, { backgroundColor: theme.bg }]}>
             <View style={[style.main, { backgroundColor: theme.bg, flex: 1 }]}>
+
                 {/* Header Section */}
                 <View style={styles.headerContainer}>
                     <AppBar
                         color={theme.bg}
                         elevation={0}
                         leading={
-                            <TouchableOpacity onPress={() => navigation.navigate('ScanEvent')}>
+                            <TouchableOpacity onPress={() => navigation.navigate('QrAdmin')}>
                                 <IonIcon name="arrow-back" color={theme.txt} size={30} />
                             </TouchableOpacity>
                         }
@@ -93,8 +96,8 @@ const Scanner = () => {
                 {/* QR Code Scanner Section */}
                 <View style={styles.scannerWrapper}>
                     <QRCodeScanner
-                       ref={(node) => setScanner(node)}
-                        onRead={onSuccess} // Triggered when a QR code is successfully scanned
+                        ref={(node) => setScanner(node)}
+                        onRead={(e) => onSuccess(e)} // Triggered when a QR code is successfully scanned
                         flashMode={RNCamera.Constants.FlashMode.off} // Control the flash mode
                         cameraStyle={styles.cameraStyle}
                         reactivate={true}
@@ -127,4 +130,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Scanner;
+export default ScanExhibitor;

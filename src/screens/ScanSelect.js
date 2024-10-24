@@ -17,7 +17,7 @@ const ScanSelect = () => {
     const route = useRoute();
 
     const { event_id } = route.params;
-    // console.log('event_id: ', event_id);
+    console.log('event_id: ', event_id);
 
     const theme = useContext(themeContext);
     const navigation = useNavigation();
@@ -60,16 +60,24 @@ const ScanSelect = () => {
         <SafeAreaView style={[style.area, { backgroundColor: theme.bg }]}>
             <View style={[style.main, { backgroundColor: theme.bg, marginTop: 20, marginBottom: 100 }]}>
                 <ScrollView>
-                    <AppBar
-                        color={theme.bg}
-                        elevation={0}
-                        leading={
-                            <TouchableOpacity onPress={() => navigation.navigate('BottomNavigator')}>
-                                <IonIcon name="arrow-back" color={theme.txt} size={30} />
-                            </TouchableOpacity>
-                        }
-                        title={<Text style={[style.apptitle, { color: theme.txt }]}>Scan Events</Text>}
-                    />
+                    {/* Modified Header Section */}
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        // paddingHorizontal: 10,
+                        marginBottom: 10
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('ScanEvent')}
+                            style={{ paddingRight: 8 }}
+                        >
+                            <IonIcon name="arrow-back" color={theme.txt} size={28} />
+                        </TouchableOpacity>
+                        <Text style={[style.apptitle, {
+                            color: theme.txt,
+                            marginLeft: 4
+                        }]}>Scan Event</Text>
+                    </View>
 
                     <View style={styles.content}>
                         <View style={styles.section}>
