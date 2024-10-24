@@ -73,19 +73,6 @@ export default function MyTabs() {
           headerShown: false,
         }} />
 
-      <Tab.Screen name="FCard" component={Menu}
-        options={{
-          tabBarShowLabel: true,
-          tabBarLabel: ({ focused, color, }) => (
-            <Text style={{ color: focused ? Colors.default : Colors.disable, fontFamily: 'Urbanist-Regular' }}>Menu</Text>
-          ),
-          tabBarIcon: ({ focused, color }) => {
-            return <Ionicons name="menu" size={30}
-              color={focused ? Colors.default : Colors.disable} />
-          },
-          headerShown: false,
-        }} />
-
       <Tab.Screen name="Profile" component={Profile}
         options={{
           tabBarShowLabel: true,
@@ -94,6 +81,19 @@ export default function MyTabs() {
           ),
           tabBarIcon: ({ focused, color }) => {
             return <Icons name="account-outline" size={30}
+              color={focused ? Colors.default : Colors.disable} />
+          },
+          headerShown: false,
+        }} />
+
+      <Tab.Screen name="FCard" component={Menu}
+        options={{
+          tabBarShowLabel: true,
+          tabBarLabel: ({ focused, color, }) => (
+            <Text style={{ color: focused ? Colors.default : Colors.disable, fontFamily: 'Urbanist-Regular' }}>Menu</Text>
+          ),
+          tabBarIcon: ({ focused, color }) => {
+            return <Ionicons name="menu" size={30}
               color={focused ? Colors.default : Colors.disable} />
           },
           headerShown: false,
