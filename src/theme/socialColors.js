@@ -1,0 +1,18 @@
+export const Colors = {
+    primary: '#F78361',
+    primary1: '#F54B64',
+    active: '#000000',
+    // disable:'#9E9E9E',
+    secondary: '#FFFFFF',
+    lable: '#9D9D9D',
+    disable: '#4E586E',
+    disable1: '#333A4D',
+    border: '#E0E0E0',
+    btntxt: '#FF2D55',
+    input: '#FFFFFF20',
+    bg: '#242A37',
+    search: '#8E8E9330',
+    bg1: '#1E2432',
+    bg2: '#00000020',
+    txt: '#0A1F44',
+};
