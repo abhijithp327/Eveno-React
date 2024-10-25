@@ -10,14 +10,16 @@ import { AppBar } from '@react-native-material/core';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 
 
-const InvalidTicket = () => {
+const ExhibitorInvalidTicket = () => {
 
     const theme = useContext(themeContext);
     const navigation = useNavigation();
     const { width } = Dimensions.get('window');
     const route = useRoute();
 
-    const { data, code } = route.params;
+    const { data, code, eventData } = route.params;
+
+    console.log('data in: ', data,);
 
     const [errorMessage, setErrorMessage] = useState("Nothing");
 
@@ -25,7 +27,7 @@ const InvalidTicket = () => {
     useEffect(() => {
         if (data) {
 
-            
+
             setErrorMessage(data.message);
         }
     }, [data]);
@@ -72,7 +74,7 @@ const InvalidTicket = () => {
                             marginBottom: 20,
                         }}
                     >
-                        
+
                         <Text style={{ color: theme.txt, fontSize: 16 }}>Ticket ID {code}</Text>
                     </View>
                     <Text
@@ -105,7 +107,7 @@ const InvalidTicket = () => {
                         marginBottom: 10,
                     }}
                     onPress={() => {
-                        navigation.replace('ScanTicketDetail');
+                        navigation.replace('ScanExhibitor', { eventData: eventData });
                     }}
                 >
                     <Text style={[style.btntxt, { color: Colors.secondary }]}>Scan Next Tickets</Text>
@@ -127,4 +129,4 @@ const InvalidTicket = () => {
     );
 }
 
-export default InvalidTicket;
+export default ExhibitorInvalidTicket;

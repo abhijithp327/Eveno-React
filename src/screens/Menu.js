@@ -4,7 +4,7 @@ import theme from '../theme/theme';
 import themeContext from '../theme/themeContex';
 import style from '../theme/style';
 import { Colors } from '../theme/color';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppBar, } from '@react-native-material/core';
 import { Avatar } from 'react-native-elements';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -24,19 +24,30 @@ export default function Menu() {
     const navigation = useNavigation();
     const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        const getUserFromStorage = async () => {
-            try {
-                const userData = await AsyncStorage.getItem('user');
-                if (userData) {
-                    setUser(JSON.parse(userData));
+    useFocusEffect(
+        React.useCallback(() => {
+            const getUserFromStorage = async () => {
+                try {
+                    const userData = await AsyncStorage.getItem('user');
+                    if (userData) {
+                        setUser(JSON.parse(userData));
+                    } else {
+                        // No user found, redirect to login
+                        navigation.replace('Login');
+                    }
+                } catch (error) {
+                    console.error('Error fetching user from AsyncStorage:', error);
+                    navigation.replace('Login');
                 }
-            } catch (error) {
-                console.error('Error fetching user from AsyncStorage:', error);
-            }
-        };
-        getUserFromStorage();
-    }, [])
+            };
+            getUserFromStorage();
+
+            // Optional: Return cleanup function
+            return () => {
+                setUser(null); // Clear user data when screen loses focus
+            };
+        }, [])
+    );
 
     // Define role IDs
     const ROLES = {

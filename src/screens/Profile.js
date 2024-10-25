@@ -3,7 +3,7 @@ import React, { useState, useContext, useRef, useEffect } from 'react'
 import { Colors } from '../theme/color'
 import style from '../theme/style'
 import themeContext from '../theme/themeContex'
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppBar } from '@react-native-material/core';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -31,19 +31,30 @@ export default function Profile() {
 
     const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        const getUserFromStorage = async () => {
-            try {
-                const userData = await AsyncStorage.getItem('user');
-                if (userData) {
-                    setUser(JSON.parse(userData));
+    useFocusEffect(
+        React.useCallback(() => {
+            const getUserFromStorage = async () => {
+                try {
+                    const userData = await AsyncStorage.getItem('user');
+                    if (userData) {
+                        setUser(JSON.parse(userData));
+                    } else {
+                        // No user found, redirect to login
+                        navigation.replace('Login');
+                    }
+                } catch (error) {
+                    console.error('Error fetching user from AsyncStorage:', error);
+                    navigation.replace('Login');
                 }
-            } catch (error) {
-                console.error('Error fetching user from AsyncStorage:', error);
-            }
-        };
-        getUserFromStorage();
-    }, [])
+            };
+            getUserFromStorage();
+
+            // Optional: Return cleanup function
+            return () => {
+                setUser(null); // Clear user data when screen loses focus
+            };
+        }, [])
+    );
 
     console.log('user: ', user);
 

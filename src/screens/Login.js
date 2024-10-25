@@ -30,7 +30,7 @@ export default function Login() {
 
   const { isUserLoggedIn } = useSelector(state => state.auth);
 
-  console.log("Loggedin", isUserLoggedIn);
+  // console.log("Loggedin", isUserLoggedIn);
 
   const handleLogin = async () => {
 

@@ -93,7 +93,7 @@ const Scanner = () => {
                 {/* QR Code Scanner Section */}
                 <View style={styles.scannerWrapper}>
                     <QRCodeScanner
-                       ref={(node) => setScanner(node)}
+                        ref={(node) => setScanner(node)}
                         onRead={onSuccess} // Triggered when a QR code is successfully scanned
                         flashMode={RNCamera.Constants.FlashMode.off} // Control the flash mode
                         cameraStyle={styles.cameraStyle}

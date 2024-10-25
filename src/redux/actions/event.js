@@ -48,10 +48,20 @@ export const scanTicketExhibitorApi = async (id, data) => {
 };
 
 
-
 export const getAllExhibitorEventsApi = async (perPage, page, searchQuery) => {
     try {
         const response = await axiosInstance.get(`/exhibitorforms/exhibitions?per_page=${perPage}&page=${page}&search_query=${encodeURIComponent(searchQuery)}`);
+        return response.data;
+    } catch (error) {
+        console.error("getEvents API error: ", error);
+        return error.response.data;
+    }
+};
+
+
+export const getAllExhibitorScannedUsersApi = async (id, perPage, page, searchQuery) => {
+    try {
+        const response = await axiosInstance.get(`/exhibitorforms/scannedusers?event_id=${id}&per_page=${perPage}&page=${page}&search_query=${encodeURIComponent(searchQuery)}`);
         return response.data;
     } catch (error) {
         console.error("getEvents API error: ", error);

@@ -4,12 +4,13 @@ import theme from '../theme/theme';
 import themeContext from '../theme/themeContex';
 import style from '../theme/style';
 import { Colors } from '../theme/color';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppBar, } from '@react-native-material/core';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Avatar } from 'react-native-paper';
 import { color } from 'react-native-elements/dist/helpers';
 import TopNavigator from '../navigator/TopNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const width = Dimensions.get('screen').width
 const height = Dimensions.get('screen').height
@@ -20,13 +21,43 @@ export default function Home() {
     const navigation = useNavigation();
     const [select, setselect] = useState(false);
     const [isSelect, setisSelect] = useState(false);
-
+    const [user, setUser] = useState(null);
+   
     const [T1, setT1] = useState(false)
     const [T2, setT2] = useState(false)
     const [T3, setT3] = useState(false)
     const [T4, setT4] = useState(false)
     const [T5, setT5] = useState(false)
     const [T6, setT6] = useState(false)
+
+    const ALLOWED_ROLES = [2, 3, 5];
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const getUserFromStorage = async () => {
+                try {
+                    const userData = await AsyncStorage.getItem('user');
+                    if (userData) {
+                        setUser(JSON.parse(userData));
+                    }
+                } catch (error) {
+                    console.error('Error fetching user from AsyncStorage:', error);
+                    navigation.replace('Login');
+                }
+            };
+            getUserFromStorage();
+
+            // Optional: Return cleanup function
+            return () => {
+                setUser(null); // Clear user data when screen loses focus
+            };
+        }, [])
+    );
+
+    const hasScannerPermission = (userRoles) => {
+        if (!userRoles) return false;
+        return userRoles.some(role => ALLOWED_ROLES.includes(role));
+    };
 
     return (
         <SafeAreaView style={[style.area, { backgroundColor: theme.bg, }]}>
@@ -65,16 +96,18 @@ export default function Home() {
                     </TouchableOpacity> */}
 
                     {/* Scanner Image */}
-                    <TouchableOpacity onPress={() => navigation.navigate('ScanEvent')}>
-                        <Image
-                            source={require('../../assets/image/scanner.png')}
-                            style={{
-                                width: width * 0.1, // Scale image size based on screen width
-                                height: width * 0.1,
-                                marginHorizontal: width * 0.04,
-                            }}
-                        />
-                    </TouchableOpacity>
+                    {user && hasScannerPermission(user.roles) && (
+                        <TouchableOpacity onPress={() => navigation.navigate('ScanEvent')}>
+                            <Image
+                                source={require('../../assets/image/scanner.png')}
+                                style={{
+                                    width: width * 0.1,
+                                    height: width * 0.1,
+                                    marginHorizontal: width * 0.04,
+                                }}
+                            />
+                        </TouchableOpacity>
+                    )}
 
                     {/* Notification Icon */}
                     <TouchableOpacity onPress={() => navigation.navigate('Notification2')}>

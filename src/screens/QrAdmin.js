@@ -86,9 +86,14 @@ const QrAdmin = () => {
                         >
                             <View
                                 style={{
-                                    backgroundColor: Colors.orange,
-                                    borderRadius: 50,
-                                    padding: 10,
+                                    backgroundColor: Colors.default,
+                                    borderRadius: 100,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    padding: 8,
+                                    width: 40,
+                                    height: 40
                                 }}
                             >
                                 <Icon name={item.icon} size={20} color="#fff" />

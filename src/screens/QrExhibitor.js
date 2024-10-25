@@ -180,7 +180,7 @@ const QrExhibitor = () => {
         return isApproved ? (
             <TouchableOpacity
                 key={uniqueKey}
-                onPress={() => navigation.navigate('ScanSelect', { event_id: event.event_id })}
+                onPress={() => navigation.navigate('ExhibitorEventDetails', { data: event })}
                 activeOpacity={0.7}
             >
                 <CardContent />
@@ -198,7 +198,7 @@ const QrExhibitor = () => {
                 {/* Header Section */}
                 <View style={styles.headerContainer}>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('Home')}
+                        onPress={() => navigation.navigate('BottomNavigator')}
                         style={styles.backButton}
                     >
                         <IonIcon name="arrow-back" color={theme.txt} size={28} />
@@ -331,7 +331,6 @@ const styles = StyleSheet.create({
         color: Colors.disable,
         fontFamily: 'Urbanist-Regular',
         flexShrink: 1,
-        numberOfLines: 1
     },
     contentContainer: {
         marginLeft: 15,

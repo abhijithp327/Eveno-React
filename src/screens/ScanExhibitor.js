@@ -26,7 +26,10 @@ const ScanExhibitor = () => {
 
     const dispatch = useDispatch();
 
-    // const { event_id, gate, agenda } = route?.params;
+    const { eventData } = route?.params;
+
+
+    // console.log('data scanner exhibitor: ', eventData);
 
 
     const theme = useContext(themeContext);
@@ -56,17 +59,18 @@ const ScanExhibitor = () => {
 
         try {
 
-            const response = await dispatch(scanTicketExhibitor({ id: event_id, data }));
+            const response = await dispatch(scanTicketExhibitor({ id: eventData.event_id, data }));
             console.log('response', response);
             if (response.payload && response.payload.success) {
                 const result = response.payload.result;
                 if (result) {
-                    navigation.replace('TicketSuccess', { data: result });
+                    navigation.replace('ExhibitorTicketSuccess', { data: result, eventData: eventData, qrCodeData: qrData });
                 }
             } else {
-                navigation.replace('InvalidTicket', {
+                navigation.replace('ExhibitorInvalidTicket', {
                     data: response.payload,
-                    code: qrData
+                    code: qrData,
+                    eventData: eventData
                 });
             }
         } catch (error) {

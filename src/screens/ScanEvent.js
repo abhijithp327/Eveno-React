@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, TextInput, StatusBar, TouchableOpacity, Image, FlatList } from 'react-native'
+import { View, Text, SafeAreaView, TextInput, StatusBar, TouchableOpacity, Image, FlatList, Alert } from 'react-native'
 import React, { useState, useContext, useRef, useEffect } from 'react'
 import themeContext from '../theme/themeContex';
 import style from '../theme/style';
@@ -28,47 +28,88 @@ const ScanEvent = () => {
   const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTimeout, setSearchTimeout] = useState(null);
+  const [error, setError] = useState(null);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const fetchEvents = async (pageNumber = 1, shouldRefresh = false) => {
+    // Prevent multiple simultaneous calls
+    if (isRetrying) return;
+
     try {
       if (pageNumber === 1) {
         setLoading(true);
       } else {
         setLoadingMore(true);
       }
+      setError(null);
+      setIsRetrying(true);
 
       const response = await dispatch(getAllEvents({
         perPage: PER_PAGE,
         page: pageNumber,
         searchQuery
-      }));
+      })).unwrap(); // Use unwrap() to properly handle rejected promises
       
-      if (response.payload) {
-        const newEvents = response.payload.events || [];
+      // Check if the response is valid
+      if (response && !response.error) {
+        const newEvents = response.events || [];
         if (shouldRefresh || pageNumber === 1) {
           setAllEvents(newEvents);
         } else {
           setAllEvents(prev => [...prev, ...newEvents]);
         }
-        // Assuming your API returns total number of events or some indication
-        // that there are more events to load
         setHasMore(newEvents.length === PER_PAGE);
+        setError(null);
+      } else {
+        throw new Error(response?.error || 'No events found');
       }
     } catch (error) {
       console.error('Error fetching events:', error);
+      setError(error.message || 'An error occurred while fetching events');
+      setHasMore(false);
+      
+      // If it's a 403 error, show an alert and possibly handle authentication
+      if (error.status === 403) {
+        Alert.alert(
+          'Authentication Error',
+          'Please log in again to continue.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Navigate to login or handle authentication refresh
+                navigation.navigate('Login');
+              }
+            }
+          ]
+        );
+      }
     } finally {
       setLoading(false);
       setLoadingMore(false);
       setRefreshing(false);
+      setIsRetrying(false);
     }
   };
 
-  // Initial load
+  // Initial load - with error handling
   useEffect(() => {
-    fetchEvents(1);
+    let mounted = true;
+
+    const initializeFetch = async () => {
+      if (mounted) {
+        await fetchEvents(1);
+      }
+    };
+
+    initializeFetch();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Handle search with debounce
+  // Handle search with debounce and error handling
   const handleSearch = (text) => {
     setSearchQuery(text);
     if (searchTimeout) {
@@ -84,7 +125,7 @@ const ScanEvent = () => {
   };
 
   const handleLoadMore = () => {
-    if (!loadingMore && hasMore) {
+    if (!loadingMore && hasMore && !error) {
       const nextPage = page + 1;
       setPage(nextPage);
       fetchEvents(nextPage);
@@ -92,11 +133,33 @@ const ScanEvent = () => {
   };
 
   const handleRefresh = () => {
-    setRefreshing(true);
-    setPage(1);
-    fetchEvents(1, true);
+    if (!isRetrying) {
+      setRefreshing(true);
+      setPage(1);
+      fetchEvents(1, true);
+    }
   };
 
+  // Error UI Component
+  const ErrorDisplay = () => (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+      <Text style={[style.b16, { color: theme.txt, textAlign: 'center'}]}>
+        {error}
+      </Text>
+      <TouchableOpacity
+        onPress={() => fetchEvents(page)}
+        style={{
+          backgroundColor: Colors.default,
+          padding: 10,
+          borderRadius: 5,
+        }}
+      >
+        <Text style={[style.b14, { color: 'white' }]}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Rest of your rendering code remains the same
   const renderItem = ({ item: event }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate('ScanSelect', { event_id: event.id })}
@@ -226,6 +289,8 @@ const ScanEvent = () => {
             <ActivityIndicator size="large" color={Colors.default} />
             <Text style={[style.b16, { color: theme.txt }]}>Loading Events...</Text>
           </View>
+        ) : error ? (
+          <ErrorDisplay />
         ) : (
           <FlatList
             data={allEvents}

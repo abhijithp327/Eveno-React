@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getAllEventsApi, getAllExhibitorEventsApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi } from "../actions/event";
+import { getAllEventsApi, getAllExhibitorEventsApi, getAllExhibitorScannedUsersApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi } from "../actions/event";
 
 
 
@@ -26,6 +26,11 @@ const initialState = {
     isExhibitorEventsLoaded: false,
     isExhibitorEventsLoadError: false,
     allExhibitorEvents: [],
+
+    isExhibitorScannedUsersLoading: false,
+    isExhibitorScannedUsersLoaded: false,
+    isExhibitorScannedUsersLoadError: false,
+    allExhibitorScannedUsers: [],
 
 
 };
@@ -79,6 +84,15 @@ export const getAllExhibitorEvents = createAsyncThunk('getAllExhibitorEvents', a
         return thunkAPI.rejectWithValue(error.message);
     }
 });
+
+export const getAllExhibitorScannedUsers = createAsyncThunk('getAllExhibitorScannedUsers', async ({ id, perPage = 10, page = 1, searchQuery = '' }, thunkAPI) => {
+    try {
+        const response = await getAllExhibitorScannedUsersApi(id, perPage, page, searchQuery);
+        return thunkAPI.fulfillWithValue(response.result);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+})
 
 
 const eventSlice = createSlice({
@@ -154,6 +168,24 @@ const eventSlice = createSlice({
                 state.isExhibitorEventsLoading = false;
                 state.isExhibitorEventsLoaded = false;
                 state.isExhibitorEventsLoadError = true;
+            })
+
+            // get all exhibitor scanned users
+            .addCase(getAllExhibitorScannedUsers.pending, (state) => {
+                state.isExhibitorScannedUsersLoading = true;
+                state.isExhibitorScannedUsersLoaded = false;
+                state.isExhibitorScannedUsersLoadError = false;
+            })
+            .addCase(getAllExhibitorScannedUsers.fulfilled, (state, action) => {
+                state.isExhibitorScannedUsersLoading = false;
+                state.isExhibitorScannedUsersLoaded = true;
+                state.isExhibitorScannedUsersLoadError = false;
+                state.allExhibitorScannedUsers = action.payload;
+            })
+            .addCase(getAllExhibitorScannedUsers.rejected, (state, action) => {
+                state.isExhibitorScannedUsersLoading = false;
+                state.isExhibitorScannedUsersLoaded = false;
+                state.isExhibitorScannedUsersLoadError = true;
             })
 
 
