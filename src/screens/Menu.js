@@ -63,7 +63,7 @@ export default function Menu() {
         {
             id: 1,
             icon: 'star',
-            title: 'Manage Events (Organizer)',
+            title: 'Manage Events',
             description: 'You can list, update, edit or remove events from here.',
             routeName: 'ManageEvent',
             allowedRoles: [ROLES.ADMIN, ROLES.SUPER_ADMIN]
@@ -71,58 +71,59 @@ export default function Menu() {
         {
             id: 2,
             icon: 'building',
-            title: 'Manage Exhibitions (Exhibitor)',
+            title: 'Manage Exhibitions',
             description: 'You can list, update, edit or remove Exhibitions from here.',
             routeName: 'ManageExhibition',
-            allowedRoles: [ROLES.EXHIBITOR, ROLES.ADMIN, ROLES.SUPER_ADMIN]
+            allowedRoles: [ROLES.EXHIBITOR]
         },
         {
             id: 3,
             icon: 'qrcode',
-            title: 'QR Scan - (Admin)',
+            title: 'QR Scan',
             description: 'Scan QR Codes of Tickets to validate or view details.',
             routeName: 'QrAdmin',
-            allowedRoles: [ROLES.ADMIN, ROLES.SUPER_ADMIN]
+            allowedRoles: [ROLES.SUPER_ADMIN]
         },
-        {
-            id: 4,
-            icon: 'file',
-            title: 'Reports - (Admin)',
-            description: 'Reports of each event and their performances.',
-            routeName: 'ManageEvent',
-            allowedRoles: [ROLES.ADMIN, ROLES.SUPER_ADMIN]
-        },
+        // {
+        //     id: 4,
+        //     icon: 'file',
+        //     title: 'Reports',
+        //     description: 'Reports of each event and their performances.',
+        //     routeName: 'ManageEvent',
+        //     allowedRoles: [ROLES.ADMIN, ROLES.SUPER_ADMIN]
+        // },
         {
             id: 5,
             icon: 'qrcode',
-            title: 'QR Scan - (Onsite)',
+            title: 'QR Scan',
             description: 'Scan QR Codes of Tickets to validate details.',
-            routeName: 'ManageEvent',
-            allowedRoles: [ROLES.ONSITE_STAFF, ROLES.ADMIN, ROLES.SUPER_ADMIN]
+            routeName: 'ScanEvent',
+            allowedRoles: [ROLES.ONSITE_STAFF, ROLES.ADMIN]
+
         },
-        {
-            id: 6,
-            icon: 'diamond',
-            title: 'Affiliate Marketing - (Admin)',
-            description: 'You can view all the affiliates and their performance.',
-            routeName: 'ManageEvent',
-            allowedRoles: [ROLES.ADMIN, ROLES.SUPER_ADMIN]
-        },
-        {
-            id: 7,
-            icon: 'check-circle',
-            title: 'Checkin & Print - (Onsite, Admin)',
-            description: 'Scan QR Codes of Tickets to validate details.',
-            routeName: 'ManageEvent',
-            allowedRoles: [ROLES.ONSITE_STAFF, ROLES.ADMIN, ROLES.SUPER_ADMIN]
-        },
+        // {
+        //     id: 6,
+        //     icon: 'diamond',
+        //     title: 'Affiliate Marketing',
+        //     description: 'You can view all the affiliates and their performance.',
+        //     routeName: 'ManageEvent',
+        //     allowedRoles: [ROLES.ADMIN, ROLES.SUPER_ADMIN]
+        // },
+        // {
+        //     id: 7,
+        //     icon: 'check-circle',
+        //     title: 'Checkin & Print',
+        //     description: 'Scan QR Codes of Tickets to validate details.',
+        //     routeName: 'ManageEvent',
+        //     allowedRoles: [ROLES.ONSITE_STAFF, ROLES.ADMIN, ROLES.SUPER_ADMIN]
+        // },
         {
             id: 8,
             icon: 'qrcode',
-            title: 'QR Scan - (Exhibitor)',
+            title: 'QR Scan',
             description: 'Scan QR Codes of Tickets to validate or view details.',
             routeName: 'QrExhibitor',
-            allowedRoles: [ROLES.EXHIBITOR, ROLES.SUPER_ADMIN]
+            allowedRoles: [ROLES.EXHIBITOR]
         },
     ];
 
@@ -205,7 +206,7 @@ export default function Menu() {
                     ))}
 
                     {/* KYC UI Section */}
-                    <View style={{
+                    {/* <View style={{
                         backgroundColor: Colors.secondary,
                         borderRadius: 10,
                         padding: 16,
@@ -235,7 +236,7 @@ export default function Menu() {
                         >
                             <Text style={[style.btntxt, { color: Colors.secondary, fontSize: 14 }]}>Verify</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </ScrollView>
 
             </View>

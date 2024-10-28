@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getAllEventsApi, getAllExhibitorEventsApi, getAllExhibitorScannedUsersApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi } from "../actions/event";
+import { getAllEventsApi, getAllExhibitorEventsApi, getAllExhibitorScannedUsersApi, getUserTicketsApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi } from "../actions/event";
 
 
 
@@ -31,6 +31,11 @@ const initialState = {
     isExhibitorScannedUsersLoaded: false,
     isExhibitorScannedUsersLoadError: false,
     allExhibitorScannedUsers: [],
+
+    isUserTicketsLoading: false,
+    isUserTicketsLoaded: false,
+    isUserTicketsLoadError: false,
+    userTickets: [],
 
 
 };
@@ -92,7 +97,17 @@ export const getAllExhibitorScannedUsers = createAsyncThunk('getAllExhibitorScan
     } catch (error) {
         return thunkAPI.rejectWithValue(error.message);
     }
-})
+});
+
+
+export const getUserTickets = createAsyncThunk('getUserTickets', async ({ is_canceled, past_order }, thunkAPI) => {
+    try {
+        const response = await getUserTicketsApi(is_canceled, past_order);
+        return thunkAPI.fulfillWithValue(response.result);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+});
 
 
 const eventSlice = createSlice({
@@ -188,6 +203,23 @@ const eventSlice = createSlice({
                 state.isExhibitorScannedUsersLoadError = true;
             })
 
+            // get user tickets
+            .addCase(getUserTickets.pending, (state) => {
+                state.isUserTicketsLoading = true;
+                state.isUserTicketsLoaded = false;
+                state.isUserTicketsLoadError = false;
+            })
+            .addCase(getUserTickets.fulfilled, (state, action) => {
+                state.isUserTicketsLoading = false;
+                state.isUserTicketsLoaded = true;
+                state.isUserTicketsLoadError = false;
+                state.userTickets = action.payload;
+            })
+            .addCase(getUserTickets.rejected, (state, action) => {
+                state.isUserTicketsLoading = false;
+                state.isUserTicketsLoaded = false;
+                state.isUserTicketsLoadError = true;
+            })
 
     }
 });

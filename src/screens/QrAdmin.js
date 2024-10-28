@@ -99,8 +99,8 @@ const QrAdmin = () => {
                                 <Icon name={item.icon} size={20} color="#fff" />
                             </View>
                             <View style={{ marginLeft: 12, flex: 1 }}>
-                                <Text style={[style.title, { fontSize: 16, fontWeight: 'bold', color: '#333' }]}>{item.title}</Text>
-                                <Text style={[style.r14, { fontSize: 14, color: '#666', marginTop: 4 }]}>{item.description}</Text>
+                                <Text style={[{ fontSize: 16, color: '#333', fontFamily: 'Urbanist-SemiBold' }]}>{item.title}</Text>
+                                <Text style={[style.r14, { fontSize: 14, fontFamily: 'Urbanist-SemiBold', color: '#666', marginTop: 4 }]}>{item.description}</Text>
                             </View>
                             <AntIcon name="arrowright" size={20} color={Colors.active} />
                         </TouchableOpacity>

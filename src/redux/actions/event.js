@@ -68,3 +68,15 @@ export const getAllExhibitorScannedUsersApi = async (id, perPage, page, searchQu
         return error.response.data;
     }
 };
+
+
+
+export const getUserTicketsApi = async (is_canceled, past_order) => {
+    try {
+        const response = await axiosInstance.get(`/events/tickets/user/allorder?is_canceled=${is_canceled}&&past_order=${past_order}`);
+        return response.data;
+    } catch (error) {
+        console.error("getEvents API error: ", error);
+        return error.response.data;
+    }
+};
