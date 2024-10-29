@@ -208,6 +208,7 @@ const eventSlice = createSlice({
                 state.isUserTicketsLoading = true;
                 state.isUserTicketsLoaded = false;
                 state.isUserTicketsLoadError = false;
+                state.userTickets = [];
             })
             .addCase(getUserTickets.fulfilled, (state, action) => {
                 state.isUserTicketsLoading = false;

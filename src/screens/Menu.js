@@ -79,9 +79,9 @@ export default function Menu() {
         {
             id: 3,
             icon: 'qrcode',
-            title: 'QR Scan',
+            title: 'Ticket Details',
             description: 'Scan QR Codes of Tickets to validate or view details.',
-            routeName: 'QrAdmin',
+            routeName: 'ScanTicketDetail',
             allowedRoles: [ROLES.SUPER_ADMIN]
         },
         // {
@@ -124,6 +124,22 @@ export default function Menu() {
             description: 'Scan QR Codes of Tickets to validate or view details.',
             routeName: 'QrExhibitor',
             allowedRoles: [ROLES.EXHIBITOR]
+        },
+        {
+            id: 9,
+            icon: 'check-square-o',
+            title: 'Validate Ticket',
+            description: 'Scan QR Codes of Tickets to validate or view details.',
+            routeName: 'ScanEvent',
+            allowedRoles: [ROLES.SUPER_ADMIN]
+        },
+        {
+            id: 10,
+            icon: 'building',
+            title: 'Validate Session',
+            description: 'Scan QR Codes of Tickets to validate or view details.',
+            routeName: 'ScanEvent',
+            allowedRoles: [ROLES.SUPER_ADMIN]
         },
     ];
 
