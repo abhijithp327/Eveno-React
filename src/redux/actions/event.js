@@ -80,3 +80,14 @@ export const getUserTicketsApi = async (is_canceled, past_order) => {
         return error.response.data;
     }
 };
+
+
+export const getEventTicketDetailsApi = async (id) => {
+    try {
+        const response = await axiosInstance.get(`/events/tickets/order/single/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("getEventTicketDetails API error: ", error);
+        return error.response.data;
+    }
+};

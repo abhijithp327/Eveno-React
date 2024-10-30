@@ -109,6 +109,8 @@ const ScanEvent = () => {
     };
   }, []);
 
+  
+
   // Handle search with debounce and error handling
   const handleSearch = (text) => {
     setSearchQuery(text);

@@ -85,6 +85,7 @@ import ExhibitorEventDetails from '../screens/ExhibitorEventDetails';
 import LeadDetails from '../screens/LeadDetails';
 import ExhibitorTicketSuccess from '../screens/ExhibitorTicketSuccess';
 import ExhibitorInvalidTicket from '../screens/ExhibitorInvalidTicket';
+import ValidateSession from '../screens/ValidateSession';
 
 
 const Stack = createNativeStackNavigator();
@@ -446,6 +447,12 @@ export default function StackNavigator() {
           <Stack.Screen
             name="ScanSelect"
             component={ScanSelect}
+            options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+            name="ValidateSession"
+            component={ValidateSession}
             options={{ headerShown: false }}
           />
 

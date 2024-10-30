@@ -98,6 +98,7 @@ const ValidatedTicket = () => {
                             </Text> */}
                         </View>
                     </View>
+                    
                     {/* Ticket Info Section */}
                     <View
                         style={{

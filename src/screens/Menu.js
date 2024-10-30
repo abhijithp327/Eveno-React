@@ -95,7 +95,7 @@ export default function Menu() {
         {
             id: 5,
             icon: 'qrcode',
-            title: 'QR Scan',
+            title: 'Validate Ticket',
             description: 'Scan QR Codes of Tickets to validate details.',
             routeName: 'ScanEvent',
             allowedRoles: [ROLES.ONSITE_STAFF, ROLES.ADMIN]
@@ -120,7 +120,7 @@ export default function Menu() {
         {
             id: 8,
             icon: 'qrcode',
-            title: 'QR Scan',
+            title: 'Lead Scan',
             description: 'Scan QR Codes of Tickets to validate or view details.',
             routeName: 'QrExhibitor',
             allowedRoles: [ROLES.EXHIBITOR]
@@ -131,7 +131,7 @@ export default function Menu() {
             title: 'Validate Ticket',
             description: 'Scan QR Codes of Tickets to validate or view details.',
             routeName: 'ScanEvent',
-            allowedRoles: [ROLES.SUPER_ADMIN]
+            allowedRoles: [ROLES.SUPER_ADMIN],
         },
         {
             id: 10,
@@ -139,7 +139,8 @@ export default function Menu() {
             title: 'Validate Session',
             description: 'Scan QR Codes of Tickets to validate or view details.',
             routeName: 'ScanEvent',
-            allowedRoles: [ROLES.SUPER_ADMIN]
+            allowedRoles: [ROLES.SUPER_ADMIN],
+            onPress: () => navigation.navigate('ScanEvent', { fromValidateSession: true })
         },
     ];
 

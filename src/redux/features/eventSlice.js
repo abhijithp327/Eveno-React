@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getAllEventsApi, getAllExhibitorEventsApi, getAllExhibitorScannedUsersApi, getUserTicketsApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi } from "../actions/event";
+import { getAllEventsApi, getAllExhibitorEventsApi, getAllExhibitorScannedUsersApi, getEventTicketDetailsApi, getUserTicketsApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi } from "../actions/event";
 
 
 
@@ -36,6 +36,11 @@ const initialState = {
     isUserTicketsLoaded: false,
     isUserTicketsLoadError: false,
     userTickets: [],
+
+    isEventTicketDetailsLoading: false,
+    isEventTicketDetailsLoaded: false,
+    isEventTicketDetailsLoadError: false,
+
 
 
 };
@@ -108,6 +113,15 @@ export const getUserTickets = createAsyncThunk('getUserTickets', async ({ is_can
         return thunkAPI.rejectWithValue(error.message);
     }
 });
+
+export const getEventTicketDetails = createAsyncThunk('getEventTicketDetails', async (id, thunkAPI) => {
+    try {
+        const response = await getEventTicketDetailsApi(id);
+        return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+})
 
 
 const eventSlice = createSlice({
@@ -220,6 +234,23 @@ const eventSlice = createSlice({
                 state.isUserTicketsLoading = false;
                 state.isUserTicketsLoaded = false;
                 state.isUserTicketsLoadError = true;
+            })
+
+            // get event ticket details
+            .addCase(getEventTicketDetails.pending, (state) => {
+                state.isEventTicketDetailsLoading = true;
+                state.isEventTicketDetailsLoaded = false;
+                state.isEventTicketDetailsLoadError = false;
+            })
+            .addCase(getEventTicketDetails.fulfilled, (state, action) => {
+                state.isEventTicketDetailsLoading = false;
+                state.isEventTicketDetailsLoaded = true;
+                state.isEventTicketDetailsLoadError = false;
+            })
+            .addCase(getEventTicketDetails.rejected, (state, action) => {
+                state.isEventTicketDetailsLoading = false;
+                state.isEventTicketDetailsLoaded = false;
+                state.isEventTicketDetailsLoadError = true;
             })
 
     }

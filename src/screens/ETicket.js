@@ -1,139 +1,304 @@
-import { View, Text, TextInput, ScrollView, TouchableOpacity, ImageBackground, Image, Dimensions, KeyboardAvoidingView, Modal } from 'react-native'
-import React, { useState, useContext } from 'react'
-import { Colors } from '../theme/color'
-import style from '../theme/style'
-import themeContext from '../theme/themeContex'
-import { useNavigation } from '@react-navigation/native';
-import { AppBar } from '@react-native-material/core';
-import Icon from 'react-native-vector-icons/Ionicons';
-import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { Avatar } from 'react-native-paper'
-import OtpInputs from 'react-native-otp-inputs'
-import Clipboard from '@react-native-clipboard/clipboard'
-import { SafeAreaView } from 'react-native'
-import RBSheet from 'react-native-raw-bottom-sheet';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Dimensions } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
+import themeContext from '../theme/themeContex';
+import style from '../theme/style';
+import { Colors } from '../theme/color';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import QRCode from 'react-native-qrcode-svg';
+import { useDispatch } from 'react-redux';
+import { getEventTicketDetails } from '../redux/features/eventSlice';
+import { Image } from 'react-native-elements';
+import appConfig from '../config/appConfig';
+import EventImg from '../../assets/image/m18.png';
+import { formatDate } from '../utils/formatDate';
 
-
-const width = Dimensions.get('screen').width
-const height = Dimensions.get('screen').height
-
-export default function ETicket() {
+const ETicket = () => {
     const theme = useContext(themeContext);
     const navigation = useNavigation();
+    const { width } = Dimensions.get('window');
+    const dispatch = useDispatch();
+    const route = useRoute();
+    const { orderId } = route.params;
+    console.log('orderId : ', orderId);
+
+    const [ticketData, setTicketData] = useState(null);
+    const [currentQRIndex, setCurrentQRIndex] = useState(0); 
+
+    useEffect(() => {
+        const fetchBookingDetails = async () => {
+            try {
+                const response = await dispatch(getEventTicketDetails(orderId));
+                const data = response.payload.result;
+                setTicketData(data);
+            } catch (error) {
+                console.log('error : ', error);
+            }
+        };
+        fetchBookingDetails();
+    }, [orderId]);
+
+    // Create QR code data string for the current QR code
+    const qrCodeData = ticketData ? JSON.stringify({
+        ticketId: ticketData.orderticket_id,
+        eventId: ticketData.event_id,
+        eventTitle: ticketData.event_title,
+        qrCode: ticketData.ticket_qr_codes[currentQRIndex]
+    }) : '';
+
+    // Get the first event image URL if available
+    const eventImageUrl = ticketData?.eventImages?.[0]?.name
+        ? `${appConfig.server.imageBaseUrl}${ticketData.eventImages[0].name}`
+        : EventImg;
+
+    // Handle showing next QR code
+    const showNextQR = () => {
+        if (currentQRIndex < ticketData.ticket_qr_codes.length - 1) {
+            setCurrentQRIndex(currentQRIndex + 1);
+        }
+    };
+
+    // Handle showing previous QR code
+    const showPrevQR = () => {
+        if (currentQRIndex > 0) {
+            setCurrentQRIndex(currentQRIndex - 1);
+        }
+    };
+
     return (
-        <SafeAreaView style={[style.area, { backgroundColor: theme.bg }]}>
-            <View style={[style.main, { backgroundColor: theme.bg ,marginTop:20}]}>
-                <AppBar
-                    color={theme.bg}
-                    elevation={0}
-                    title='E-Ticket'
-                    titleStyle={[style.apptitle, { color: theme.txt }]}
-                    leading={<TouchableOpacity onPress={() => navigation.navigate('TicketTab')}>
-                        <Icon name="arrow-back"
-                            color={theme.txt} size={30}
-                        />
+        <SafeAreaView style={[style.area, { backgroundColor: theme.input }]}>
+            <View style={[style.main, { backgroundColor: theme.input, marginTop: 10, marginBottom: 16 }]}>
+                {/* Header Section */}
+                <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 10
+                }}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('BottomNavigator')}
+                        style={{ paddingRight: 8 }}
+                    >
+                        <IonIcon name="arrow-back" color={theme.txt} size={28} />
                     </TouchableOpacity>
-                    }
-                    trailing={<Icon name='ellipsis-horizontal-circle' size={25} color={theme.txt} />}
-                />
-                <Image source={theme.eticket} resizeMode='stretch' style={{ height: height / 7, width: width / 1.12, marginTop: 15 }} />
-                <ScrollView showsVerticalScrollIndicator={false}>
+                    <Text style={[style.apptitle, {
+                        color: theme.txt,
+                        marginLeft: 4
+                    }]}>E-Ticket Details</Text>
+                </View>
 
-                    <View style={{ paddingVertical: 10, paddingHorizontal: 5 }}>
-                        <View style={[style.shadow, { backgroundColor: theme.borderbg, borderRadius: 20, padding: 15 }]}>
-                            <Text style={[style.b14, { color: theme.disable2 }]}>Event</Text>
-                            <Text style={[style.subtitle, { color: theme.txt, marginTop: 10 }]}>National Music Festival</Text>
-                            <Text style={[style.b14, { color: theme.disable2, marginTop: 10 }]}>Date and Hour</Text>
-                            <Text style={[style.subtitle, { color: theme.txt, marginTop: 10 }]}>Monday, Dec 24 • 18.00 - 23.00 PM</Text>
-                            <Text style={[style.b14, { color: theme.disable2, marginTop: 10 }]}>Event Location</Text>
-                            <Text style={[style.subtitle, { color: theme.txt, marginTop: 10 }]}>Grand Park, New York City, US</Text>
-                            <Text style={[style.b14, { color: theme.disable2, marginTop: 10 }]}>Event Organizer</Text>
-                            <Text style={[style.subtitle, { color: theme.txt, marginTop: 10 }]}>World of Music</Text>
-                        </View>
-                    </View>
+                <ScrollView>
 
-                    <View style={{ paddingVertical: 15, paddingHorizontal: 5 }}>
-                        <View style={[style.shadow, { backgroundColor: theme.borderbg, borderRadius: 15, padding: 15 }]}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Full Name</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>Andrew Ainsley</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Nick Name</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>Andrew</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Gender</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>Male</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Date of birth</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>12/27/1995</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Country</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>United States</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Phone</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>+1 111 467 378 399</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Email</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>andrew_ainsley@yo...com</Text>
-                            </View>
-                        </View>
-                    </View>
+                    {/* QR Code Section */}
+                    {ticketData && (
+                        <View
+                            style={{
+                                backgroundColor: '#FFF',
+                                borderRadius: 10,
+                                padding: 20,
+                                alignItems: 'center',
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 1 },
+                                shadowOpacity: 0.2,
+                                shadowRadius: 1.41,
+                                elevation: 2,
+                                marginBottom: 20,
+                            }}
+                        >
+                            <QRCode
+                                value={qrCodeData}
+                                size={150}
+                                color="black"
+                                backgroundColor="white"
+                            />
+                            <Text style={[style.b14, {
+                                color: Colors.active,
+                                marginTop: 10,
+                                textAlign: 'center'
+                            }]}>
+                                {'*****' + ticketData.ticket_qr_codes[currentQRIndex].slice(-5)}
+                            </Text>
 
-                    <View style={{ paddingVertical: 15, paddingHorizontal: 5 }}>
-                        <View style={[style.shadow, { backgroundColor: theme.borderbg, borderRadius: 15, padding: 15 }]}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>1 Seats (Economy)</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>$50.00</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Tax</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>$5.00</Text>
-                            </View>
-                            <View style={[style.divider, { marginVertical: 10, backgroundColor: theme.border }]}></View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Total</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>$55.00</Text>
-                            </View>
-                        </View>
-                    </View>
+                            {/* Conditionally show arrows and current QR code index */}
+                            {ticketData.ticket_qr_codes.length > 1 && (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
+                                    {/* Left Arrow */}
+                                    <TouchableOpacity
+                                        onPress={showPrevQR}
+                                        disabled={currentQRIndex === 0} // Disable when on first QR
+                                        style={{ padding: 10 }}
+                                    >
+                                        <IonIcon
+                                            name="chevron-back"
+                                            size={24}
+                                            color={currentQRIndex === 0 ? Colors.disable : theme.txt} // Change color when disabled
+                                        />
+                                    </TouchableOpacity>
 
-                    <View style={{ paddingVertical: 15, paddingHorizontal: 5 }}>
-                        <View style={[style.shadow, { backgroundColor: theme.borderbg, borderRadius: 15, padding: 15 }]}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Payment Methods</Text>
-                                <Text style={[style.b16, { color: theme.disable1 }]}>MasterCard</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Order ID</Text>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[style.b16, { color: theme.disable1 }]}>5457383979</Text>
-                                    <Icon name='copy-outline' size={20} color={Colors.default} style={{ marginLeft: 5 }} />
+                                    {/* Current QR index display */}
+                                    <Text style={{ color: theme.txt, fontSize: 16, fontWeight: 'bold', paddingHorizontal: 10 }}>
+                                        {currentQRIndex + 1}/{ticketData.ticket_qr_codes.length}
+                                    </Text>
+
+                                    {/* Right Arrow */}
+                                    <TouchableOpacity
+                                        onPress={showNextQR}
+                                        disabled={currentQRIndex === ticketData.ticket_qr_codes.length - 1} // Disable when on last QR
+                                        style={{ padding: 10 }}
+                                    >
+                                        <IonIcon
+                                            name="chevron-forward"
+                                            size={24}
+                                            color={currentQRIndex === ticketData.ticket_qr_codes.length - 1 ? Colors.disable : theme.txt} // Change color when disabled
+                                        />
+                                    </TouchableOpacity>
                                 </View>
-                            </View>
-                            <View style={[style.divider, { marginVertical: 10, backgroundColor: theme.border }]}></View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Text style={[style.b14, { color: theme.disable2 }]}>Status</Text>
-                                <View style={{ paddingHorizontal: 10, borderColor: Colors.default, borderWidth: 1, paddingVertical: 5, borderRadius: 5 }}>
-                                    <Text style={[style.b10, { color: Colors.default }]}>Paid</Text>
+                            )}
+                        </View>
+                    )}
+
+                    {/* Event Details Section */}
+                    {ticketData && (
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                backgroundColor: Colors.secondary,
+                                borderRadius: 10,
+                                padding: 10,
+                                alignItems: 'center',
+                                marginBottom: 20,
+                                borderColor: Colors.secondary,
+                                borderWidth: 3,
+                            }}
+                        >
+                            {eventImageUrl ? (
+                                <Image
+                                    source={{ uri: eventImageUrl }}
+                                    style={{ width: 60, height: 60, borderRadius: 10, marginRight: 15 }}
+                                    resizeMode="cover"
+                                />
+                            ) : (
+                                <View style={{
+                                    width: 60,
+                                    height: 60,
+                                    borderRadius: 10,
+                                    marginRight: 15,
+                                    backgroundColor: Colors.border,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }}>
+                                    <IonIcon name="image" size={24} color={Colors.disable} />
                                 </View>
+                            )}
+                            <View style={{ flex: 1 }}>
+                                <Text style={[style.title, { color: theme.txt, fontSize: 16, fontWeight: '600' }]}>
+                                    {ticketData.event_title}
+                                </Text>
+                                <Text style={{ color: Colors.disable, fontSize: 14, marginTop: 5 }}>
+                                    <IonIcon name="location" size={14} color={Colors.disable} />  {ticketData.venue_name}
+                                </Text>
+                                <Text style={{ color: Colors.disable, fontSize: 14, marginTop: 5 }}>
+                                    <IonIcon name="calendar" size={14} color={Colors.disable} />  {formatDate(ticketData.performance_startdatetime)}
+                                </Text>
                             </View>
                         </View>
-                    </View>
+                    )}
+
+                    {/* Customer Details Section */}
+                    {ticketData && (
+                        <View
+                            style={{
+                                backgroundColor: Colors.secondary,
+                                borderRadius: 10,
+                                padding: 15,
+                                marginBottom: 20,
+                                borderColor: Colors.secondary,
+                                borderWidth: 2,
+                            }}
+                        >
+                            <Text style={[style.b16, {
+                                color: theme.txt,
+                                fontSize: 16,
+                                fontWeight: '600',
+                                marginBottom: 15,
+                                borderBottomWidth: 1,
+                                borderBottomColor: Colors.border,
+                                paddingBottom: 8
+                            }]}>
+                                {ticketData.user_name}
+                            </Text>
+                            <View style={{ marginBottom: 12 }}>
+                                <Text style={[style.r12, {
+                                    color: Colors.disable,
+                                    fontSize: 12,
+                                    marginBottom: 4
+                                }]}>
+                                    Ticket/Seat
+                                </Text>
+                                <Text style={[style.b12, {
+                                    color: theme.txt,
+                                    fontSize: 14
+                                }]}>
+                                    Gold
+                                </Text>
+                            </View>
+                            <View>
+                                <Text style={[style.r12, {
+                                    color: Colors.disable,
+                                    fontSize: 12,
+                                    marginBottom: 4
+                                }]}>
+                                    Price
+                                </Text>
+                                <Text style={[style.b12, {
+                                    color: theme.txt,
+                                    fontSize: 14
+                                }]}>
+                                    200 AED
+                                </Text>
+                            </View>
+                        </View>
+                    )}
 
                 </ScrollView>
-            </View>
-            <View style={{ backgroundColor: theme.bg, paddingVertical: 20, paddingHorizontal: 20, borderTopRightRadius: 20, borderTopLeftRadius: 20, borderColor: theme.border, borderWidth: 1 }}>
-                <TouchableOpacity onPress={() => navigation.navigate('TicketTab')}
-                style={[style.btn]}>
-                    <Text style={[style.btntxt]}>Download Ticket</Text>
+
+                {/* Back to Home Button */}
+                <View style={{ alignItems: 'center', backgroundColor: Colors.secondary, marginBottom: 16 }}>
+                <TouchableOpacity
+                    style={{
+                        width: width - 40,
+                        paddingVertical: 11,
+                        backgroundColor: Colors.default,
+                        borderRadius: 10,
+                        alignItems: 'center',
+                        marginBottom: 10,
+                    }}
+                    onPress={() => {
+                        navigation.replace('BottomNavigator');
+                    }}
+                >
+                    <Text style={[style.btntxt, { color: Colors.secondary }]}>Download Ticket</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={{
+                        width: width - 40,
+                        paddingVertical: 11,
+                        backgroundColor: Colors.secondary,
+                        borderRadius: 10,
+                        borderColor: Colors.default,
+                        borderWidth: 1,
+                        alignItems: 'center'
+                    }}
+                    onPress={() => {
+                        navigation.replace('BottomNavigator');
+                    }}
+                >
+                    <Text style={[style.btntxt, { color: Colors.active }]}>Back To Home</Text>
                 </TouchableOpacity>
             </View>
+            </View>
+
         </SafeAreaView>
-    )
-}
+    );
+};
+
+export default ETicket;

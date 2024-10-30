@@ -25,15 +25,14 @@ const ScanSelect = () => {
     const [selectedAgenda, setSelectedAgenda] = useState(null);
 
     const gates = [1, 2, 3, 4, 5];
-    const agenda = ['Agenda 1', 'Agenda 2', 'Agenda 3', 'Agenda 4'];
+    // const agenda = ['Agenda 1', 'Agenda 2', 'Agenda 3', 'Agenda 4'];
 
     const handleSubmit = () => {
-        if (!selectedGate || !selectedAgenda) {
-            Alert.alert('Error', 'Please select a gate and agenda');
+        if (!selectedGate) {
+            Alert.alert('Error', 'Please select a gate');
             return;
         }
-        console.log('Scan with', selectedGate, selectedAgenda);
-        navigation.navigate('Scanner', { event_id, gate: selectedGate, agenda: selectedAgenda });
+        navigation.navigate('Scanner', { event_id, gate: selectedGate });
     }
 
     const renderSelectionCards = (items, selectedItem, setSelectedItem, icon) => (
@@ -85,10 +84,10 @@ const ScanSelect = () => {
                             {renderSelectionCards(gates, selectedGate, setSelectedGate, 'enter-outline')}
                         </View>
 
-                        <View style={styles.section}>
+                        {/* <View style={styles.section}>
                             <Text style={[styles.sectionTitle, { color: theme.txt }]}>Select Agenta</Text>
                             {renderSelectionCards(agenda, selectedAgenda, setSelectedAgenda, 'person-outline')}
-                        </View>
+                        </View> */}
 
                         <TouchableOpacity
                             style={[styles.scanButton, { backgroundColor: Colors.default }]}
