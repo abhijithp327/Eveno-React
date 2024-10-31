@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getAllEventsApi, getAllExhibitorEventsApi, getAllExhibitorScannedUsersApi, getEventTicketDetailsApi, getUserTicketsApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi } from "../actions/event";
+import { getAllEventsApi, getAllExhibitorEventsApi, getAllExhibitorScannedUsersApi, getEventTicketDetailsApi, getUserTicketsApi, scanEventApi, scanTicketDetailApi, scanTicketExhibitorApi, scanValidateSessionApi, updateSessionAttendanceApi } from "../actions/event";
 
 
 
@@ -41,7 +41,13 @@ const initialState = {
     isEventTicketDetailsLoaded: false,
     isEventTicketDetailsLoadError: false,
 
+    isScanValidateSessionLoading: false,
+    isScanValidateSessionLoaded: false,
+    isScanValidateSessionLoadError: false,
 
+    isUpdateSessionAttendanceLoading: false,
+    isUpdateSessionAttendanceLoaded: false,
+    isUpdateSessionAttendanceLoadError: false,
 
 };
 
@@ -121,7 +127,28 @@ export const getEventTicketDetails = createAsyncThunk('getEventTicketDetails', a
     } catch (error) {
         return thunkAPI.rejectWithValue(error.message);
     }
-})
+});
+
+
+export const scanValidateSession = createAsyncThunk('scanValidateSession', async ({ id, code }, thunkAPI) => {
+    try {
+        const response = await scanValidateSessionApi(id, code);
+        return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+});
+
+
+export const updateSessionAttendance = createAsyncThunk('updateSessionAttendance', async (data, thunkAPI) => {
+    try {
+        const response = await updateSessionAttendanceApi(data);
+        return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+
+});
 
 
 const eventSlice = createSlice({
@@ -251,6 +278,40 @@ const eventSlice = createSlice({
                 state.isEventTicketDetailsLoading = false;
                 state.isEventTicketDetailsLoaded = false;
                 state.isEventTicketDetailsLoadError = true;
+            })
+
+            // scan validate session
+            .addCase(scanValidateSession.pending, (state) => {
+                state.isScanValidateSessionLoading = true;
+                state.isScanValidateSessionLoaded = false;
+                state.isScanValidateSessionLoadError = false;
+            })
+            .addCase(scanValidateSession.fulfilled, (state, action) => {
+                state.isScanValidateSessionLoading = false;
+                state.isScanValidateSessionLoaded = true;
+                state.isScanValidateSessionLoadError = false;
+            })
+            .addCase(scanValidateSession.rejected, (state, action) => {
+                state.isScanValidateSessionLoading = false;
+                state.isScanValidateSessionLoaded = false;
+                state.isScanValidateSessionLoadError = true;
+            })
+
+            // update session attendance
+            .addCase(updateSessionAttendance.pending, (state) => {
+                state.isUpdateSessionAttendanceLoading = true;
+                state.isUpdateSessionAttendanceLoaded = false;
+                state.isUpdateSessionAttendanceLoadError = false;
+            })
+            .addCase(updateSessionAttendance.fulfilled, (state, action) => {
+                state.isUpdateSessionAttendanceLoading = false;
+                state.isUpdateSessionAttendanceLoaded = true;
+                state.isUpdateSessionAttendanceLoadError = false;
+            })
+            .addCase(updateSessionAttendance.rejected, (state, action) => {
+                state.isUpdateSessionAttendanceLoading = false;
+                state.isUpdateSessionAttendanceLoaded = false;
+                state.isUpdateSessionAttendanceLoadError = true;
             })
 
     }

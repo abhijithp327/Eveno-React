@@ -8,7 +8,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import { AppBar } from '@react-native-material/core';
 import { useRoute } from '@react-navigation/native';
-import { scanEvent, scanTicketDetail, scanTicketExhibitor } from '../redux/features/eventSlice';
+import { scanEvent, scanTicketDetail, scanTicketExhibitor, scanValidateSession } from '../redux/features/eventSlice';
 import { useDispatch } from 'react-redux';
 
 // import { ViewPropTypes } from 'react-native-view-prop-types';
@@ -26,11 +26,7 @@ const ValidateSession = () => {
 
     const dispatch = useDispatch();
 
-    const { eventData } = route?.params;
-
-
-    // console.log('data scanner exhibitor: ', eventData);
-
+    const { event_id } = route?.params;
 
     const theme = useContext(themeContext);
     const navigation = useNavigation();
@@ -53,24 +49,21 @@ const ValidateSession = () => {
     const onSuccess = async (e) => {
 
         const qrData = e.data;
-        const data = {
-            code: qrData
-        }
-
+    
         try {
 
-            const response = await dispatch(scanTicketExhibitor({ id: eventData.event_id, data }));
+            const response = await dispatch(scanValidateSession({ id: event_id, code: qrData }));
             console.log('response', response);
             if (response.payload && response.payload.success) {
                 const result = response.payload.result;
                 if (result) {
-                    navigation.replace('ExhibitorTicketSuccess', { data: result, eventData: eventData, qrCodeData: qrData });
+                    navigation.replace('SessionSuccess', { data: result, qrCodeData: qrData });
                 }
             } else {
-                navigation.replace('ExhibitorInvalidTicket', {
+                navigation.replace('SessionInvalidTicket', {
                     data: response.payload,
                     code: qrData,
-                    eventData: eventData
+                    event_id: event_id
                 });
             }
         } catch (error) {
@@ -83,18 +76,23 @@ const ValidateSession = () => {
         <SafeAreaView style={[style.area, { backgroundColor: theme.bg }]}>
             <View style={[style.main, { backgroundColor: theme.bg, flex: 1 }]}>
 
-                {/* Header Section */}
-                <View style={styles.headerContainer}>
-                    <AppBar
-                        color={theme.bg}
-                        elevation={0}
-                        leading={
-                            <TouchableOpacity onPress={() => navigation.navigate('QrAdmin')}>
-                                <IonIcon name="arrow-back" color={theme.txt} size={30} />
-                            </TouchableOpacity>
-                        }
-                    />
-                    <Text style={[style.apptitle, { color: theme.txt, marginLeft: 8 }]}>Scan Ticket</Text>
+                {/* Modified Header Section */}
+                <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    // paddingHorizontal: 10,
+                    marginBottom: 10
+                }}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('BottomNavigator')}
+                        style={{ paddingRight: 8 }}
+                    >
+                        <IonIcon name="arrow-back" color={theme.txt} size={28} />
+                    </TouchableOpacity>
+                    <Text style={[style.apptitle, {
+                        color: theme.txt,
+                        marginLeft: 4
+                    }]}>Validate Session</Text>
                 </View>
 
                 {/* QR Code Scanner Section */}

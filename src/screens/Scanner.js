@@ -60,9 +60,9 @@ const Scanner = () => {
                 const result = response.payload.result;
                 console.log('result', result.isValid);
                 if (result.isValid) {
-                    navigation.replace('ValidatedTicket', { data: result, scanParams: { event_id, gate } });
+                    navigation.replace('ValidatedTicket', { data: result, scanParams: { event_id, gate }, qrCodeData: qrData });
                 } else {
-                    navigation.replace('InvalidedTicket', { data: result, scanParams: { event_id, gate } });
+                    navigation.replace('InvalidedTicket', { data: result, scanParams: { event_id, gate }, qrCodeData: qrData });
                 }
             } else {
                 alert(response.payload.message);

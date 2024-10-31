@@ -3,7 +3,7 @@ import React, { useState, useContext, useRef, useEffect } from 'react'
 import themeContext from '../theme/themeContex';
 import style from '../theme/style';
 import { Colors } from '../theme/color';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IonIcon from 'react-native-vector-icons/Ionicons';
@@ -19,6 +19,7 @@ const ScanEvent = () => {
   const dispatch = useDispatch();
   const theme = useContext(themeContext);
   const navigation = useNavigation();
+  const route = useRoute();
 
   const [allEvents, setAllEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,8 @@ const ScanEvent = () => {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [error, setError] = useState(null);
   const [isRetrying, setIsRetrying] = useState(false);
+
+  const { fromValidateSession } = route.params || {};
 
   const fetchEvents = async (pageNumber = 1, shouldRefresh = false) => {
     // Prevent multiple simultaneous calls
@@ -49,7 +52,7 @@ const ScanEvent = () => {
         page: pageNumber,
         searchQuery
       })).unwrap(); // Use unwrap() to properly handle rejected promises
-      
+
       // Check if the response is valid
       if (response && !response.error) {
         const newEvents = response.events || [];
@@ -67,7 +70,7 @@ const ScanEvent = () => {
       console.error('Error fetching events:', error);
       setError(error.message || 'An error occurred while fetching events');
       setHasMore(false);
-      
+
       // If it's a 403 error, show an alert and possibly handle authentication
       if (error.status === 403) {
         Alert.alert(
@@ -109,7 +112,7 @@ const ScanEvent = () => {
     };
   }, []);
 
-  
+
 
   // Handle search with debounce and error handling
   const handleSearch = (text) => {
@@ -145,7 +148,7 @@ const ScanEvent = () => {
   // Error UI Component
   const ErrorDisplay = () => (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-      <Text style={[style.b16, { color: theme.txt, textAlign: 'center'}]}>
+      <Text style={[style.b16, { color: theme.txt, textAlign: 'center' }]}>
         {error}
       </Text>
       <TouchableOpacity
@@ -164,7 +167,17 @@ const ScanEvent = () => {
   // Rest of your rendering code remains the same
   const renderItem = ({ item: event }) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate('ScanSelect', { event_id: event.id })}
+      onPress={() => {
+        if (fromValidateSession) {
+          navigation.navigate('ValidateSession', {
+            event_id: event.id,
+          });
+        } else {
+          navigation.navigate('ScanSelect', {
+            event_id: event.id
+          });
+        }
+      }}
       style={{
         flexDirection: 'row',
         padding: 15,
@@ -242,17 +255,24 @@ const ScanEvent = () => {
   return (
     <SafeAreaView style={[style.area, { backgroundColor: theme.bg }]}>
       <View style={[style.main, { backgroundColor: theme.bg }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
-          <AppBar
-            color={theme.bg}
-            elevation={0}
-            leading={
-              <TouchableOpacity onPress={() => navigation.navigate('BottomNavigator')}>
-                <IonIcon name="arrow-back" color={theme.txt} size={30} />
-              </TouchableOpacity>
-            }
-          />
-          <Text style={[style.apptitle, { color: theme.txt, flex: 1, marginLeft: 8 }]}>Scan Events</Text>
+
+        {/* Modified Header Section */}
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          // paddingHorizontal: 10,
+          marginBottom: 10
+        }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('BottomNavigator')}
+            style={{ paddingRight: 8 }}
+          >
+            <IonIcon name="arrow-back" color={theme.txt} size={28} />
+          </TouchableOpacity>
+          <Text style={[style.apptitle, {
+            color: theme.txt,
+            marginLeft: 4
+          }]}>Scan Event</Text>
         </View>
 
         {/* Search Bar */}

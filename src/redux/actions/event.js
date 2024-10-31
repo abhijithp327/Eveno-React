@@ -72,8 +72,9 @@ export const getAllExhibitorScannedUsersApi = async (id, perPage, page, searchQu
 
 
 export const getUserTicketsApi = async (is_canceled, past_order) => {
+    console.log("is_canceled: ", is_canceled, "past_order: ", past_order);
     try {
-        const response = await axiosInstance.get(`/events/tickets/user/allorder?is_canceled=${is_canceled}&&past_order=${past_order}`);
+        const response = await axiosInstance.get(`/events/tickets/user/allorder?is_canceled=${is_canceled}&past_order=${past_order}`);
         return response.data;
     } catch (error) {
         console.error("getEvents API error: ", error);
@@ -88,6 +89,28 @@ export const getEventTicketDetailsApi = async (id) => {
         return response.data;
     } catch (error) {
         console.error("getEventTicketDetails API error: ", error);
+        return error.response.data;
+    }
+};
+
+
+export const scanValidateSessionApi = async (id, code) => {
+    try {
+        const response = await axiosInstance.get(`/events/tickets/scan/session?code=${code}&event_id=${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("scanValidateSession API error: ", error);
+        return error.response.data;
+    }
+};
+
+
+export const updateSessionAttendanceApi = async (data) => {
+    try {
+        const response = await axiosInstance.post(`/events/tickets/checkin/session`, data);
+        return response.data;
+    } catch (error) {
+        console.error("updateSessionAttendance API error: ", error);
         return error.response.data;
     }
 };

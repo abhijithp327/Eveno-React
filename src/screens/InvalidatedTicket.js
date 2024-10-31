@@ -17,7 +17,7 @@ const InvalidedTicket = () => {
     const { width } = Dimensions.get('window');
     const route = useRoute();
 
-    const { data, scanParams } = route.params;
+    const { data, scanParams, qrCodeData } = route.params;
 
     // console.log('data in: ', data,);
 
@@ -76,7 +76,7 @@ const InvalidedTicket = () => {
                     >
 
                         <Text style={{ color: theme.txt, fontSize: 16, marginBottom: 8 }}>
-                            Ticket ID: {data?.ticketDetails?.ticket?.code}
+                            Ticket ID: {qrCodeData}
                         </Text>
                     </View>
                     <Text

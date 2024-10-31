@@ -19,7 +19,20 @@ const ExhibitorTicketSuccess = () => {
     const route = useRoute();
 
     const { data, eventData, qrCodeData } = route.params;
-    // console.log('data  ALLLLLLLLLLLLLLLLLLL  ', data);
+
+    console.log("dataaaaaaaaaaaaa", data);
+
+    
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        });
+    };
 
 
     return (
@@ -54,34 +67,33 @@ const ExhibitorTicketSuccess = () => {
                     </View>
 
                     {/* QR Code Section */}
-                    <View
-                        style={{
-                            backgroundColor: '#FFF',
-                            borderRadius: 10,
-                            padding: 20,
-                            alignItems: 'center',
-                            shadowColor: '#000',
-                            shadowOffset: { width: 0, height: 1 },
-                            shadowOpacity: 0.2,
-                            shadowRadius: 1.41,
-                            elevation: 0,
-                            marginBottom: 20,
-                        }}
-                    >
+                    <View style={{
+                        backgroundColor: '#FFF',
+                        borderRadius: 10,
+                        padding: 20,
+                        alignItems: 'center',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 1.41,
+                        elevation: 0,
+                        marginBottom: 20,
+                    }}>
                         <QRCode
                             value={qrCodeData}
                             size={150}
                             color="black"
                             backgroundColor="white"
                         />
-                        {/* <Text style={[style.b14, {
+                        <Text style={[style.b14, {
                             color: Colors.active,
                             marginTop: 10,
                             textAlign: 'center'
                         }]}>
-                            {'*****' + data.ticket.ticket_qr_code.slice(-5)}
-                        </Text> */}
+                            {'*****' + qrCodeData.slice(-5)}
+                        </Text>
                     </View>
+
                     {/* Event Details Section */}
                     <View
                         style={{
@@ -101,7 +113,7 @@ const ExhibitorTicketSuccess = () => {
                         />
                         <View style={{ flex: 1 }}>
                             <Text style={[style.title, { color: theme.txt, fontSize: 16, fontWeight: '600' }]}>
-                                Live Music By Melrick @ Stone
+                                {data.event_title}
                             </Text>
                             {/* <Text style={{ color: Colors.disable, fontSize: 14, marginTop: 5 }}>
                                 <Icon name="map-marker" size={14} color={Colors.disable} /> Stage Name, Bengaluru KA
@@ -121,11 +133,11 @@ const ExhibitorTicketSuccess = () => {
                     >
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                             <Text style={[style.r12, { color: Colors.active, fontSize: 14 }]}>Type</Text>
-                            <Text style={[style.b12, { color: theme.txt, fontSize: 14, fontWeight: '600' }]}>Platinum</Text>
+                            <Text style={[style.b12, { color: theme.txt, fontSize: 14, fontWeight: '600' }]}>{data.ticket_name}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                             <Text style={[style.r12, { color: Colors.active, fontSize: 14 }]}>Price</Text>
-                            <Text style={[style.b12, { color: Colors.default, fontSize: 14, fontWeight: '600' }]}>AED 30</Text>
+                            <Text style={[style.b12, { color: Colors.default, fontSize: 14, fontWeight: '600' }]}>${data.ticket_price}</Text>
                         </View>
                     </View>
                     {/* Dates Section */}
@@ -144,12 +156,12 @@ const ExhibitorTicketSuccess = () => {
                         <View style={{ alignItems: 'center', flex: 1 }}>
                             <Icon name="calendar" size={16} color={Colors.disable} />
                             <Text style={[style.r14, { color: Colors.disable, fontSize: 14, marginTop: 5 }]}>Start Date</Text>
-                            <Text style={[style.b14, { color: theme.txt, fontSize: 14, marginTop: 3 }]}>Jul 2, 8:00 PM</Text>
+                            <Text style={[style.b14, { color: theme.txt, fontSize: 14, marginTop: 3 }]}>{formatDate(data.performance_startdatetime)}</Text>
                         </View>
                         <View style={{ alignItems: 'center', flex: 1 }}>
                             <Icon name="calendar" size={16} color={Colors.disable} />
                             <Text style={[style.r14, { color: Colors.disable, fontSize: 14, marginTop: 5 }]}>End Date</Text>
-                            <Text style={[style.b14, { color: theme.txt, fontSize: 14, marginTop: 3 }]}>Jul 2, 8:00 PM</Text>
+                            <Text style={[style.b14, { color: theme.txt, fontSize: 14, marginTop: 3 }]}>{formatDate(data.performance_enddatetime)}</Text>
                         </View>
                     </View>
                     {/* Email Section */}

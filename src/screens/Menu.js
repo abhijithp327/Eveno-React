@@ -139,8 +139,8 @@ export default function Menu() {
             title: 'Validate Session',
             description: 'Scan QR Codes of Tickets to validate or view details.',
             routeName: 'ScanEvent',
-            allowedRoles: [ROLES.SUPER_ADMIN],
-            onPress: () => navigation.navigate('ScanEvent', { fromValidateSession: true })
+            allowedRoles: [ROLES.SUPER_ADMIN, ROLES.ONSITE_STAFF, ROLES.ADMIN],
+            params: { fromValidateSession: true }
         },
     ];
 
@@ -197,7 +197,7 @@ export default function Menu() {
                                 shadowRadius: 4,
                                 shadowOffset: { width: 0, height: 2 },
                             }}
-                            onPress={() => navigation.navigate(item.routeName)}
+                            onPress={() => navigation.navigate(item.routeName, item.params)}
                         >
                             <View
                                 style={{

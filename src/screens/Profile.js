@@ -16,6 +16,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EventRegister } from 'react-native-event-listeners'
 import { logout } from '../redux/features/authSlice'
+import IonIcon from 'react-native-vector-icons/Ionicons';
 
 
 
@@ -56,7 +57,7 @@ export default function Profile() {
         }, [])
     );
 
-    console.log('user: ', user);
+
 
     const handleLogout = async () => {
         try {
@@ -70,15 +71,23 @@ export default function Profile() {
     return (
         <SafeAreaView style={[style.area, { backgroundColor: theme.bg }]}>
             <View style={[style.main, { backgroundColor: theme.bg, marginTop: 30 }]}>
-                <View style={{ backgroundColor: theme.bg, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Image source={require('../../assets/image/logo1.png')} resizeMode='stretch' style={{ height: height / 35, width: width / 15 }} />
-                        <Text style={[style.apptitle, { color: theme.txt, marginLeft: 10 }]}>Profile</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Icon name='ellipsis-horizontal-circle' color={Colors.active} size={25} style={{ marginRight: 5 }} />
-
-                    </View>
+                {/* Modified Header Section */}
+                <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    // paddingHorizontal: 10,
+                    marginBottom: 10
+                }}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('BottomNavigator')}
+                        style={{ paddingRight: 8 }}
+                    >
+                        <IonIcon name="arrow-back" color={theme.txt} size={28} />
+                    </TouchableOpacity>
+                    <Text style={[style.apptitle, {
+                        color: theme.txt,
+                        marginLeft: 4
+                    }]}>Profile</Text>
                 </View>
                 <View style={{ alignItems: 'center', marginTop: 20 }}>
                     <Image source={require('../../assets/image/user.png')} resizeMode='stretch' style={{ height: height / 7, width: width / 3.2 }} />
